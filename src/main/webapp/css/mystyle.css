@@ -1,0 +1,9 @@
+
+body{
+    text-align: center;
+}
+.input-text-normal{
+    width: 400px;
+    height: 40px;
+    font-size: 36px;
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+    <!-- 注释扫描路径 -->
+    <context:component-scan base-package="com"/>
+    <!-- 事务管理使用注释 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!-- SpringMVC使用注释 -->
+    <mvc:annotation-driven/>
+    <!-- 基于容器过滤静态资源请求 -->
+    <mvc:default-servlet-handler/>
+    <!-- 定时任务使用注释 -->
+    <task:annotation-driven/>
+
+    <mvc:view-controller path="/" view-name="index"/>
+
+    <!-- 数据源 -->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="root"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/demos?createDatabaseIfNotExist=true"></property>
+    </bean>
+    <!-- Hibernate5 Session Factory -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+        <property name="packagesToScan" value="com.*"/>
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- Hibernate5 Transaction Manager -->
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <!-- SpringMVC -->
+    <bean id="jspViewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <!-- 上传文件的最大值，单位字节，默认-1，无限制，50MB -->
+        <property name="maxUploadSize" value="52428800"/>
+        <!-- 内存占用最大值，默认10240，5MB -->
+        <property name="maxInMemorySize" value="5242880"></property>
+        <!-- 临时文件目录，默认为Web容器默认临时目录 -->
+        <!--<property name="uploadTempDir" value="WEB-INF/jsp/upload/temp" />-->
+        <!-- 请求编码格式 -->
+        <property name="defaultEncoding" value="UTF-8"></property>
+        <!-- 延迟文件解析，可用于判断文件大小、获取名称等操作 -->
+        <property name="resolveLazily" value="true"/>
+    </bean>
+
+    <!-- 声明方法支持使用校验注释 -->
+    <bean
+            class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"></bean>
+
+    <mvc:resources mapping="/**" location="/"/>
+
+</beans>
